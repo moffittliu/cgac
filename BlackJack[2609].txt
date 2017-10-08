@@ -1,0 +1,175 @@
+import java.util.InputMismatchException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Main {
+
+    // I used static variables here because they can be shared among all instances of the class
+    // *Usually a variable declared in one function is not in scope in other functions
+    static int i = 1;
+    static int user; //input or  decision from the user
+
+    static int playerWins = 0;
+    static int dealerWins = 0;
+    static int tie = 0;
+    static int gameNumber = 1;
+    static int total = 0;
+
+    // this method deals with input errors
+    public static void errorHandling(){
+        //for catching errors of a different type(decimals, strings, etc)
+        try {
+            Scanner sc = new Scanner(System.in);
+            user = sc.nextInt();
+            System.out.println();
+        } catch (InputMismatchException error) {
+            System.out.println();
+            System.out.println("Invalid input! Please enter an integer value between 1 and 4.");
+            System.out.println();
+            System.out.println("1.Get another card\n2.Hold hand\n3.Print game statistics\n4.Exit");
+            System.out.println();
+            System.out.print("Choose an option: ");
+            errorHandling(); // if user enters another invalid input, the error can be caught again
+        }
+        
+        //for catching errors of other integers (such as 0, -1, 5, etc)
+        if(user < 1 || user > 4){
+            System.out.println("Invalid input! Please enter an integer value between 1 and 4.");
+            System.out.println();
+            System.out.println("1.Get another card\n2.Hold hand\n3.Print game statistics\n4.Exit");
+            System.out.println();
+            System.out.print("Choose an option: ");
+            errorHandling(); //
+        }
+
+        userDecision(); // if no error is caught, the user's input will be used in the userDecision method
+    }
+
+
+    //this method interprets the user's input based on the menu
+    public static void userDecision() {
+
+        // if user selects 1.Get another card
+        if (user == 1) {
+            i = 1;
+        }
+
+        // if user selects 2.Hold hand
+        else if (user == 2) {
+            Random rand = new Random();
+            int dealer = rand.nextInt(11) + 16;
+            System.out.println("Dealer's hand: " + dealer);
+            System.out.println("Your hand is: " + total);
+            System.out.println();
+
+            if (dealer == 21) {
+                System.out.println("Dealer wins!");
+                dealerWins++;
+            } else if (dealer > 21) {
+                System.out.println("You win!");
+                playerWins++;
+            } else if (dealer == total) {
+                System.out.println("It's a tie! No one wins!");
+                tie++;
+            } else if (dealer > total) {
+                System.out.println("Dealer wins!");
+                dealerWins++;
+            }
+            gameNumber++; // after a winner or a tie has been determined, a NEW game is started
+            System.out.println();
+            System.out.println("START GAME #" + gameNumber);
+            System.out.println();
+            total = 0; // since this is a new game, clear the player's "hand" by setting it to zero
+            i = 1; //goes back to the while loop and new cards are created
+        }
+
+        //if user selects 3. print game statistics
+        else if (user == 3) {
+            System.out.println("Number of Player wins: " + playerWins);
+            System.out.println("Number of Dealer wins: " + dealerWins);
+            System.out.println("Number of tie games: " + tie);
+            gameNumber = gameNumber - 1;
+            System.out.println("Total # of games played is: " + gameNumber);
+            double percentageOfWins = (double) (playerWins) / gameNumber * 100;
+            percentageOfWins = Math.round(percentageOfWins * 10.0) / 10.0; //round to one decimal point
+            System.out.println("Percentage of Player wins: " + percentageOfWins + "%");
+
+            System.out.println();
+            System.out.println("1.Get another card\n2.Hold hand\n3.Print game statistics\n4.Exit");
+            System.out.println();
+            System.out.print("Choose an option: ");
+            errorHandling(); //invoking the errorHandling causes it to execute; possible errors will be handled
+        }
+
+        //if user selects 4.Exit
+        else if (user == 4) {
+            i = 0; // by making i = 0, the condition for the while loop is no longer true, therefore the program terminates
+        }
+
+        // if user enters a value other than 1, 2, 3, or 4--> invalid input!
+        else {
+            errorHandling(); // if user enters something other than 1 to 4, such as 5 or a string, the error will be caught
+        }
+    }
+
+
+    public static void main(String[] args) {
+
+        System.out.println("START GAME #1");
+        System.out.println();
+
+        while (i == 1) {
+            Random rand = new Random();
+            int n = rand.nextInt(13) + 1;
+            total = total + n; // total equals the player's "hand"
+
+            // what to do for each type of card
+            if (n == 1) {
+                System.out.println("Your card is a Ace!");
+                System.out.println("Your hand is: " + total);
+            } else if (n >= 2 && n <= 10) {
+                System.out.println("Your card is a " + n + "!");
+                System.out.println("Your hand is: " + total);
+            } else if (n == 11) {
+                System.out.println("Your card is Jack!");
+                total = total - 1;
+                System.out.println("Your hand is: " + total);
+            } else if (n == 12) {
+                System.out.println("Your card is queen!");
+                total = total - 2;
+                System.out.println("Your hand is: " + total);
+            } else if (n == 13) {
+                System.out.println("Your card is king!");
+                total = total - 3;
+                System.out.println("Your hand is: " + total);
+            }
+            System.out.println();
+
+            //examines the player's hand and see if it totals up to 21 or more than 21
+            if (total == 21) {
+                System.out.println("BLACKJACK! You win!");
+                System.out.println();
+                playerWins++;
+                gameNumber++;
+                total = 0;
+                i = 1; // satisfy condition for the while loop and therefore the while loop executes again
+            } else if (total > 21) {
+                System.out.println("You exceeded 21! You lose :( ");
+                System.out.println();
+                dealerWins++;
+                gameNumber++;
+                System.out.println("START GAME #" + gameNumber);
+                System.out.println();
+                total = 0;
+                i = 1;
+            } else {
+                System.out.println("1.Get another card\n2.Hold hand\n3.Print game statistics\n4.Exit");
+                System.out.println();
+                System.out.print("Choose an option: ");
+                errorHandling(); //user input is examined by the errorHandling() method--> if no error, userDecision() will be executed
+            }
+        }
+
+        return; // the program will terminate upon exiting the loop
+    }
+}
